@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator kysely {
+  provider  = "prisma-kysely"
+  output    = "../src/types/generated"
+  fileName  = "database.ts"
+  camelCase = true
+  // NOTE: check how to override result query types
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+model FeatureFlag {
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name          String    @db.Text
+  description   String?   @db.Text
+  active        Boolean   @default(false)
+  activeRegions Json?     @map("active_regions") @db.JsonB
+  activeFrom    DateTime? @map("active_from") @db.Timestamptz
+  activeUntil   DateTime? @map("active_until") @db.Timestamptz
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt     DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+
+  @@map("feature_flags")
+}
+
+model Token {
+  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  address  String @db.Text
+  name     String @db.Text
+  chainId  Int    @map("chain_id") @db.Integer
+  symbol   String @db.Text
+  decimals Int    @db.SmallInt
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz()
+
+  prices        TokenPrice[]
+  alertSettings AlertSettings[]
+
+  @@unique([address, chainId])
+  // for faster lookup if token is multichain
+  @@index([symbol, chainId])
+  @@map("tokens")
+}
+
+model TokenPrice {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  price       Decimal  @db.Decimal
+  blockNumber BigInt   @map("block_number") @db.BigInt
+  timestamp   DateTime @db.Timestamptz()
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz()
+  tokenId     String   @map("token_id") @db.Uuid
+  token       Token    @relation(fields: [tokenId], references: [id])
+
+  @@index([tokenId, timestamp])
+  @@map("token_prices")
+}
+
+model Alert {
+  id       String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email    String          @unique @db.Text
+  settings AlertSettings[]
+
+  @@map("alerts")
+}
+
+model AlertSettings {
+  id      String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tokenId String @map("token_id") @db.Uuid
+  token   Token  @relation(fields: [tokenId], references: [id])
+  alertId String @map("alert_id") @db.Uuid
+  alert   Alert  @relation(fields: [alertId], references: [id])
+
+  threshold Decimal @db.Decimal
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz()
+
+  @@map("alert_settings")
+}
