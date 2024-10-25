@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+const { PrismaClient } = require('@prisma/client');
 
 const TOKENS = [
   {
@@ -8,8 +8,8 @@ const TOKENS = [
     chainId: 1,
     symbol: 'POL',
     decimals: 18,
-    created_at: '2024-10-25T04:50:24.698575+00:00',
-    updated_at: '2024-10-25T04:50:24.698575+00:00',
+    createdAt: '2024-10-25T04:50:24.698575+00:00',
+    updatedAt: '2024-10-25T04:50:24.698575+00:00',
   },
   {
     id: 'a61fe536-f07d-4318-b0ed-269ab7ffe156',
@@ -18,8 +18,8 @@ const TOKENS = [
     chainId: 1,
     symbol: 'BTC',
     decimals: 8,
-    created_at: '2024-10-23T22:41:50.755546+00:00',
-    updated_at: '2024-10-23T22:41:50.755546+00:00',
+    createdAt: '2024-10-23T22:41:50.755546+00:00',
+    updatedAt: '2024-10-23T22:41:50.755546+00:00',
   },
   {
     id: 'dec26d5b-6134-4730-b03e-c84a288bc6f9',
@@ -28,8 +28,8 @@ const TOKENS = [
     chainId: 137,
     symbol: 'POL',
     decimals: 18,
-    created_at: '2024-10-23T22:40:51.04476+00:00',
-    updated_at: '2024-10-23T22:40:51.04476+00:00',
+    createdAt: '2024-10-23T22:40:51.04476+00:00',
+    updatedAt: '2024-10-23T22:40:51.04476+00:00',
   },
   {
     id: 'f6463870-2fd9-4505-8c56-874af9f355d2',
@@ -38,8 +38,8 @@ const TOKENS = [
     chainId: 1,
     symbol: 'ETH',
     decimals: 18,
-    created_at: '2024-10-23T22:21:43.93028+00:00',
-    updated_at: '2024-10-23T22:21:43.93028+00:00',
+    createdAt: '2024-10-23T22:21:43.93028+00:00',
+    updatedAt: '2024-10-23T22:21:43.93028+00:00',
   },
 ];
 

@@ -36,4 +36,4 @@ ENV PORT=${PORT}
 EXPOSE ${PORT}
 
 # Command to run the application
-CMD ["sh", "-c", "pnpx prisma migrate dev && pnpm prisma db seed && node dist/main.js"]
+CMD ["sh", "-c", "pnpx prisma migrate dev && pnpx prisma db seed && node dist/main.js"]
