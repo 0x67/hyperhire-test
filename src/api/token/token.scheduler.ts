@@ -15,7 +15,7 @@ export class TokenScheduler {
   ) {}
 
   @Cron(CronExpression.EVERY_5_MINUTES)
-  async getBlockNumber() {
+  async scheduleGetTokenPriceQueue() {
     const datetime = getPreviousInterval(new Date());
     const uniqueChains = await this.db
       .selectFrom('tokens')
