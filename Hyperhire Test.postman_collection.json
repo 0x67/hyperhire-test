@@ -1,0 +1,192 @@
+{
+	"info": {
+		"_postman_id": "cb236391-b57b-4888-b461-472a619b859c",
+		"name": "Hyperhire Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15392064"
+	},
+	"item": [
+		{
+			"name": "Get Swap",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"amountIn\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/swap/:chainId/:pair",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"swap",
+						":chainId",
+						":pair"
+					],
+					"variable": [
+						{
+							"key": "chainId",
+							"value": "1"
+						},
+						{
+							"key": "pair",
+							"value": "ETH_BTC",
+							"description": "format `tokenA_tokenB`, left side always token in"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Token List",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"amountIn\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/tokens",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"tokens"
+					],
+					"query": [
+						{
+							"key": "chainId",
+							"value": "1",
+							"description": "optional",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Token Price Chart",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"amountIn\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/tokens/:chainId/:symbol/prices",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"tokens",
+						":chainId",
+						":symbol",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "chainId",
+							"value": "1",
+							"description": "optional",
+							"disabled": true
+						}
+					],
+					"variable": [
+						{
+							"key": "chainId",
+							"value": "1"
+						},
+						{
+							"key": "symbol",
+							"value": "USDC"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set Price Alert",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"gabrielabi60@gmail.com\",\r\n    \"chainId\": 1,\r\n    \"symbol\": \"ETH\",\r\n    \"threshold\": 2400\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/tokens/alert",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"tokens",
+						"alert"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://localhost:3001/api",
+			"type": "string"
+		}
+	]
+}

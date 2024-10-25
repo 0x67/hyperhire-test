@@ -5,78 +5,38 @@
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest.
 
-## Description
+## Clarification
 
-[Nest](https://github.com/nestjs/nest) API template created with love by [0x67](https://github.com/0x67). This template is created for myself to have ready with everything I could possibly need.
+The test requirements provided [here](https://hyperhire.notion.site/Blockchain-Nest-js_241007-1187ac1c0f2f80cd8c1fde63e979ec4d) is a bit ambiguous regarding few term and I've not received a reply from the recruiter so I make few assumptions and make some slight changes to the API
 
-## TODO
+- Token here is the ERC20 token deployed on EVM chain, so in the API need to specify which token to access
+- Some symbol might be altered to satisfy the requirements, i.e. WETH > ETH, WBTC > BTC (I choose WBTC instead of BTCb)
+- Price of a chain increases (feature no. 2) > This one is also ambiguous, so right now it alerts for every token
+- API - setting alert for specific price.(parameters are chain, dollar, email) > I added one additional params `symbol` to specificy which token to track the alerts
 
-- [x] Extend NestJs default HttpException
-  - [x] NotFound
-  - [x] BadRequest
-  - [ ] more exceptions
-- [x] Global exception filters
-- [ ] Global interceptors
-- [x] Redis connection using [ioredis](https://www.npmjs.com/package/ioredis)
-- [x] [Cache manager](https://github.com/jaredwray/cacheable/blob/main/packages/cache-manager/READMEv5.md) v5 + [redis store](https://www.npmjs.com/package/cache-manager-ioredis-yet)
-- [x] Logging using [Pino](https://github.com/iamolegga/nestjs-pino)
-  - [ ] Custom logger
-  - [ ] Transport logs to 3rd party (platform TBD)
-- [x] S3 service for (multipart uploads)[https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html]
-  - [ ] ACL + CORS
-  - [ ] Some kind of DRM?
-- [ ] Sentry
-- [ ] Prometheus
-- [ ] Health check
-- [ ] Elasticsearch + Logstash + Kibana
-  - [ ] Clustering
-- [ ] Cassandra or ScyllaDB
-  - [ ] Clustering
-- [x] Postgres database schema and migrations using [Prisma](https://docs.nestjs.com/recipes/prisma) andd [Kysely](https://kysely.dev/docs/getting-started) for handling query
-  - [ ] Clustering
-- [ ] Queue producer and consumer\
-- [ ] Websocket
-  - [ ] Connection upgrade
-  - [ ] Auth
-- [ ] Authorization > need to decide between keycloak, auth0 or custom implementation
-  - [ ] Access token
-  - [ ] Refresh token cycle
-- [ ] Socials
-  - [ ] Google
-  - [ ] Github
-  - [ ] Apple
-  - [ ] Facebook
-- [ ] Dockerfile
--
+## Feature
 
-## IMPORTANT NOTES!
-
-Locked dependencies versions until NestJs v11
-
-1. cache-manager@5.7.6 > [#508](https://github.com/nestjs/cache-manager/pull/508)
-2. fastify@^4 > [#13990](https://github.com/nestjs/nest/pull/13990)
+- [x] Automatically save the Price of Ethereum and Polygon every 5 minutes
+  - [x] Save WETH, POL, and WBTC on Etherum
+  - [x] Save POL on Polygon
+- [x] Automatically send an email to “hyperhire_assignment@hyperhire.in” if the price of a chain increases by more than 3%
+- [x] User alert (create alert + sending email)
+- [x] Price chart
+- [ ] Swagger
+- [x] Postman
 
 ## Environment Variables
 
 ```
 NODE_ENV=development | staging | production
 PORT=3001
+TZ=UTC
 DATABASE_URL=postgresql://user:password@localhost:5432/dbname
 
 ## REDIS
 ## url will always be used if supplied
 REDIS_URL=redis(s)://user:password@host:6379 or redis(s)://host:6379
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_USERNAME=user
-REDIS_PASSWORD=password
-
-## S3
-S3_REGION=us-east-1
-S3_ACCESS_KEY=
-S3_SECRET_ACCESS=
-S3_ENDPOINT=<http(s)://endpoint-without.bucket
-S3_BUCKET=bucketname
+MORALIS_API_KEY=your_moralis_api_key
 
 ```
 
