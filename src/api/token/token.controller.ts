@@ -1,6 +1,6 @@
-import { GetTokenPriceParams } from '@/api/token/dto';
+import { GetTokenPriceParams, SaveTokenAlertDto } from '@/api/token/dto';
 import { TokenService } from '@/api/token/token.service';
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 
 @Controller('tokens')
 export class TokenController {
@@ -16,5 +16,10 @@ export class TokenController {
     @Param() { symbol, chainId }: GetTokenPriceParams,
   ) {
     return await this.tokenService.getTokenPriceHistory(symbol, chainId);
+  }
+
+  @Post('alert')
+  async saveTokenAlert(@Body() data: SaveTokenAlertDto) {
+    return await this.tokenService.saveTokenAlert(data);
   }
 }

@@ -1,7 +1,7 @@
+import { SaveTokenAlertDto } from '@/api/token/dto';
 import { DatabaseService } from '@/modules/database/database.service';
 import { PrismaService } from '@/modules/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
-import { sql } from 'kysely';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 @Injectable()
@@ -49,6 +49,18 @@ export class TokenService {
       .executeTakeFirst();
   }
 
+  async getTokenOrThrow(symbol: string, chainId: number) {
+    const token = await this.getToken(symbol, chainId);
+
+    if (!token) {
+      throw new NotFoundException(
+        `Token with symbol '${symbol}' not found on chain with ID ${chainId}`,
+      );
+    }
+
+    return token;
+  }
+
   async getTokenById(tokenId: string) {
     return await this.db
       .selectFrom('tokens')
@@ -59,7 +71,7 @@ export class TokenService {
 
   async getTokenPriceHistory(symbol: string, chainId: number) {
     try {
-      const token = await this.getToken(symbol, chainId);
+      const token = await this.getTokenOrThrow(symbol, chainId);
 
       const results = await this.prisma.$queryRaw`
         WITH time_weighted_data AS (
@@ -94,5 +106,62 @@ export class TokenService {
       // this.logger.error(error);
       throw error;
     }
+  }
+
+  async getTokenAlert(email: string) {
+    return await this.db
+      .selectFrom('alerts')
+      .selectAll()
+      .where('email', '=', email)
+      .executeTakeFirst();
+  }
+
+  async saveTokenAlert(data: SaveTokenAlertDto) {
+    const token = await this.getTokenOrThrow(data.symbol, data.chainId);
+    let alert = await this.getTokenAlert(data.email);
+
+    if (!alert) {
+      alert = await this.db
+        .insertInto('alerts')
+        .values({
+          email: data.email,
+        })
+        .returningAll()
+        .executeTakeFirst();
+    }
+
+    let alertSetting = await this.getTokenAlertSettings(alert.id, token.id);
+
+    if (!alertSetting) {
+      return await this.db
+        .insertInto('alertSettings')
+        .values({
+          alertId: alert.id,
+          tokenId: token.id,
+          threshold: data.threshold.toString(),
+        })
+        .returningAll()
+        .executeTakeFirst();
+    }
+
+    const updated = await this.db
+      .updateTable('alertSettings')
+      .set({
+        threshold: data.threshold.toString(),
+      })
+      .where('id', '=', alertSetting.id)
+      .returningAll()
+      .executeTakeFirst();
+
+    return updated;
+  }
+
+  async getTokenAlertSettings(alertId: string, tokenId: string) {
+    return await this.db
+      .selectFrom('alertSettings')
+      .selectAll()
+      .where('alertId', '=', alertId)
+      .where('tokenId', '=', tokenId)
+      .executeTakeFirst();
   }
 }
