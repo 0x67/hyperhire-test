@@ -9,12 +9,18 @@ export class TokenPriceDto {
   datetime: Date;
 }
 
-export class GetTokenPriceParams {
+export class GetTokenPriceChartParams {
+  /**
+   * @example 1
+   */
   @IsNotEmpty()
   @IsNumber()
   @Type(() => Number)
   chainId: number;
 
+  /**
+   * @example 'ETH'
+   */
   @IsNotEmpty()
   @IsString()
   symbol: string;

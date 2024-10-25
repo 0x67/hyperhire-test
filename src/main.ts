@@ -8,8 +8,10 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { Logger } from 'nestjs-pino';
-import compression from '@fastify/compress';
+import fastifyCompress from '@fastify/compress';
+import fastifyStatic from '@fastify/static';
 import { createUUID } from '@/utils';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -26,10 +28,19 @@ async function bootstrap() {
     },
   );
 
-  // register fastify plugins
-  await app.register(compression, { encodings: ['br', 'gzip', 'deflate'] });
-  app.setGlobalPrefix('api');
+  // change default logger to pino
   app.useLogger(app.get(Logger));
+
+  // set global prefix ie. /api/:path
+  app.setGlobalPrefix('api');
+
+  // register fastify plugins
+  await app.register(fastifyCompress, { encodings: ['br', 'gzip', 'deflate'] });
+  await app.register(fastifyStatic, {
+    root: '/api',
+  });
+
+  // register global pipes, filters, and interceptors
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -38,8 +49,16 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new AnyExceptionFilter(), new HttpExceptionFilter());
 
+  // setup swagger
+  const config = new DocumentBuilder()
+    .setTitle('Hyperhire Test')
+    .setVersion('1.0')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
+
   await app.listen({
-    port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
+    port: process.env.PORT ? parseInt(process.env.PORT) : 3001,
     host: process.env.HOST || '0.0.0.0', // default to all network interfaces
   });
 }

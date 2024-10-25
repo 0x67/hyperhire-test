@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from '@/app.controller';
-import { AppService } from '@/app.service';
 import { ApiModule } from '@/api/api.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -76,7 +74,5 @@ import { ScheduleModule } from '@nestjs/schedule';
     ApiModule,
     ProcessorModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

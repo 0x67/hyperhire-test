@@ -33,7 +33,7 @@ export class TokenService {
   async listTokens(chainId?: number) {
     let query = this.db.selectFrom('tokens').selectAll();
 
-    if (chainId) {
+    if (chainId || !isNaN(chainId)) {
       query = query.where('chainId', '=', chainId);
     }
 
