@@ -31,7 +31,7 @@ import { ScheduleModule } from '@nestjs/schedule';
             port: config.get<number>('REDIS_PORT'),
             username: config.get<string>('REDIS_USERNAME'),
             password: config.get<string>('REDIS_PASSWORD'),
-            tls: {},
+            // tls: {},
           },
           config: [
             {

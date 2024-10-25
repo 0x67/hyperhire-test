@@ -7,8 +7,11 @@
 
 ## How to run
 
-1. Copy `.env.example` to `.env`, you can change the value or using the provided value as is
-2. `docker-compose up -d`
+### Docker
+
+1. Copy `.env.example` and rename to `.env`
+2. Run `docker-compose up -d`
+3. Access the API
 
 ## Clarification
 

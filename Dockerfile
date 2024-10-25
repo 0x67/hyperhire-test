@@ -5,8 +5,8 @@ WORKDIR /app
 
 RUN npm install -g pnpm
 
+# Copy the package.json and lock file and install deps
 COPY package.json pnpm-lock.yaml ./
-
 RUN pnpm install
 
 # Copy the rest of the application code
@@ -36,4 +36,4 @@ ENV PORT=${PORT}
 EXPOSE ${PORT}
 
 # Command to run the application
-CMD ["sh", "-c", "pnpx prisma migrate dev && node dist/main.js"]
+CMD ["sh", "-c", "pnpx prisma migrate dev && pnpm prisma db seed && node dist/main.js"]
