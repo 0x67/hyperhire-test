@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    command: >
+      sh -c "pnpm prisma migrate deploy && node dist/main.js"
+    environment:
+      - ENV=development
+      - PORT=3000
+      - DATABASE_URL=postgres://postgres:postgres123@db:5432/postgres # PostgreSQL connection string
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - db
+      - redis
+    networks:
+      - my-network
+
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydatabase
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - my-network
+
+  redis:
+    image: redis:alpine
+    restart: always
+    networks:
+      - my-network
+
+volumes:
+  db-data:
+
+networks:
+  my-network:
