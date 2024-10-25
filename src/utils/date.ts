@@ -1,4 +1,8 @@
-export const dateToTimestamp = (date: Date, isSecond = true) => {
+export const dateToTimestamp = (date: Date | string, isSecond = true) => {
+  if (typeof date === 'string') {
+    date = new Date(date);
+  }
+
   return isSecond ? Math.floor(date.getTime() / 1000) : date.getTime();
 };
 

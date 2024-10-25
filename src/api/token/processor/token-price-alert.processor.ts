@@ -1,6 +1,6 @@
 import { Processor } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
-import { WorkerHostProcessor } from './worker-host.processor';
+import { WorkerHostProcessor } from '../../../modules/processor/worker-host.processor';
 import { Injectable } from '@nestjs/common';
 import { QUEUE_TOKEN } from '@/modules/queue';
 import { DatabaseService } from '@/modules/database/database.service';
@@ -8,7 +8,7 @@ import { UserTokenAlertDto } from '@/modules/queue/dto/user-token-alert.dto';
 
 @Processor(QUEUE_TOKEN.USER_TOKEN_ALERT)
 @Injectable()
-export class UserTokenAlertProcessor extends WorkerHostProcessor {
+export class TokenPriceAlertProcessor extends WorkerHostProcessor {
   constructor(private readonly db: DatabaseService) {
     super();
   }

@@ -1,4 +1,7 @@
+import { Inject } from '@nestjs/common';
+import { getQueueToken } from '@nestjs/bullmq';
 import { QueueToken } from '@/modules/queue/queue.interface';
-import { InjectQueue } from '@nestjs/bullmq';
 
-export const InjectBullQueue = (queue: QueueToken) => InjectQueue(queue);
+export function InjectBullQueue(queue: QueueToken): ParameterDecorator {
+  return Inject(getQueueToken(queue));
+}

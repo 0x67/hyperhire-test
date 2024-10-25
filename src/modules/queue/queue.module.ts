@@ -5,7 +5,7 @@ import {
 } from '@/modules/queue/queue.module-definition';
 import { BullModule } from '@nestjs/bullmq';
 import { RedisService } from '@liaoliaots/nestjs-redis';
-import { DEFAULT_BULL_OPTIONS } from '@/constants';
+import { DEFAULT_BULL_OPTIONS } from '@/configs';
 
 @Module({
   imports: [

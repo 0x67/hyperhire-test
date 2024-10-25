@@ -1,7 +1,7 @@
 import { DatabaseService } from '@/modules/database/database.service';
 import { MoralisService } from '@/modules/moralis/moralis.service';
 import { InjectBullQueue } from '@/modules/queue';
-import { getPreviousInterval } from '@/utils';
+import { dateToTimestamp, getPreviousInterval } from '@/utils';
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Queue } from 'bullmq';
@@ -14,7 +14,7 @@ export class TokenScheduler {
     @InjectBullQueue('TOKEN_PRICE') private queue: Queue,
   ) {}
 
-  // @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   async getBlockNumber() {
     const datetime = getPreviousInterval(new Date());
     const uniqueChains = await this.db
@@ -44,7 +44,8 @@ export class TokenScheduler {
           datetime,
         },
         opts: {
-          jobId: `${token.id}:${datetime.getTime()}`,
+          jobId: `${token.chainId}:${token.address.toLowerCase()}:${dateToTimestamp(datetime)}`,
+          delay: 0,
         },
         name: 'TokenPrice',
       };
