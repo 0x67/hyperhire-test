@@ -5,6 +5,11 @@
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest.
 
+## How to run
+
+1. Copy `.env.example` to `.env`, you can change the value or using the provided value as is
+2. `docker-compose up -d`
+
 ## Clarification
 
 The test requirements provided [here](https://hyperhire.notion.site/Blockchain-Nest-js_241007-1187ac1c0f2f80cd8c1fde63e979ec4d) is a bit ambiguous regarding few term and I've not received a reply from the recruiter so I make few assumptions and make some slight changes to the API

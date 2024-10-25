@@ -1,4 +1,5 @@
-FROM node:18 AS builder
+# Use a multi-stage build to keep the final image lightweight
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -8,26 +9,31 @@ COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install
 
+# Copy the rest of the application code
 COPY . .
 
-RUN pnpm run prisma generate
-RUN pnpm run build
+# Build the application
+RUN pnpm build
 
-FROM node:18 AS production
+# Production stage
+FROM node:20-alpine AS production
 
-# Set the working directory
+# Set the working directory for the production image
 WORKDIR /app
 
+# Copy the built application and necessary files from the builder stage
+COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 
-RUN npm install -g pnpm && pnpm install --prod --frozen-lockfile
+# Install only production dependencies
+RUN npm install -g pnpm prisma-kysely && pnpm install --prod --frozen-lockfile
 
 # Expose the application port
-ARG PORT=3000
+ARG PORT
 ENV PORT=${PORT}
 EXPOSE ${PORT}
 
 # Command to run the application
-CMD ["node", "dist/main.js"]
+CMD ["sh", "-c", "pnpx prisma migrate dev && node dist/main.js"]

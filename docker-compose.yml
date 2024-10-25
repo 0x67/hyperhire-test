@@ -1,19 +1,16 @@
-version: '3.8'
-
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '3000:3000'
-    command: >
-      sh -c "pnpm prisma migrate deploy && node dist/main.js"
+      - '${PORT}:${PORT}'
     environment:
-      - ENV=development
-      - PORT=3000
-      - DATABASE_URL=postgres://postgres:postgres123@db:5432/postgres # PostgreSQL connection string
-      - REDIS_URL=redis://redis:6379
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - DATABASE_URL=${DATABASE_URL}
+      - DIRECT_DATABASE_URL=${DIRECT_DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
     depends_on:
       - db
       - redis
@@ -24,22 +21,31 @@ services:
     image: postgres:16
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: mydatabase
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - 5432:5432
     volumes:
       - db-data:/var/lib/postgresql/data
     networks:
       - my-network
 
   redis:
-    image: redis:alpine
+    image: bitnami/redis
     restart: always
+    environment:
+      ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - redis-data:/bitnami/redis/data
+    ports:
+      - 6379:6379
     networks:
       - my-network
 
 volumes:
   db-data:
+  redis-data:
 
 networks:
   my-network:
