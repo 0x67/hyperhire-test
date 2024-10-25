@@ -11,6 +11,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - DIRECT_DATABASE_URL=${DIRECT_DATABASE_URL}
       - REDIS_URL=${REDIS_URL}
+      - MORALIS_API_KEY=${MORALIS_API_KEY}
     depends_on:
       - db
       - redis

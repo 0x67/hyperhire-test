@@ -9,7 +9,7 @@
 
 ### Docker
 
-1. Copy `.env.example` and rename to `.env`
+1. Copy `.env.example` and rename to `.env`. Only need to change `MORALIS_API_KEY` to your own key, rest can be used as is
 2. Run `docker-compose up -d`
 3. Access the API
 
