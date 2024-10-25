@@ -11,12 +11,28 @@ import { DatabaseModule } from './modules/database/database.module';
 import { MoralisModule } from './modules/moralis/moralis.module';
 import { ProcessorModule } from '@/modules/processor/processor.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
+    }),
+    MailerModule.forRootAsync({
+      useFactory: (config: ConfigService) => ({
+        transport: {
+          host: config.get<string>('SMPT_HOST'),
+          port: config.get<number>('SMPT_PORT'),
+          secure: false,
+          auth: {
+            user: config.get<string>('SMPT_USER'),
+            pass: config.get<string>('SMPT_PASS'),
+          },
+        },
+      }),
+      inject: [ConfigService],
     }),
     LoggerModule.forRoot(loggerConfig),
     RedisModule.forRootAsync({
@@ -73,6 +89,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ScheduleModule.forRoot(),
     ApiModule,
     ProcessorModule,
+    MailModule,
   ],
 })
 export class AppModule {}

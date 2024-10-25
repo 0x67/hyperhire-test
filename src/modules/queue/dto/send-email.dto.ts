@@ -1,5 +1,5 @@
 export class SendEmailDto {
-  email: string;
+  to: string;
   subject: string;
-  message: string;
+  content: string;
 }

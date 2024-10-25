@@ -9,6 +9,10 @@ import { TokenAlertDto, TokenPriceDto } from '@/api/token/dto';
 import { TokenService } from '@/api/token/token.service';
 import { PrismaService } from '@/modules/prisma/prisma.service';
 import { subHours } from 'date-fns';
+import { MailService } from '@/modules/mail/mail.service';
+import { dateToTimestamp } from '@/utils';
+
+const HYPERHIRE_EMAIL = 'hyperhire_assignment@hyperhire.in';
 
 @Processor(QUEUE_TOKEN.TOKEN_PRICE, { concurrency: 10 })
 @Injectable()
@@ -20,6 +24,8 @@ export class TokenPriceProcessor extends WorkerHostProcessor {
     private readonly tokenService: TokenService,
     @InjectBullQueue(QUEUE_TOKEN.TOKEN_PRICE)
     private readonly tokenPriceQueue: Queue,
+    @InjectBullQueue(QUEUE_TOKEN.SEND_EMAIL)
+    private readonly sendEmailQueue: Queue,
   ) {
     super();
   }
@@ -96,6 +102,8 @@ export class TokenPriceProcessor extends WorkerHostProcessor {
       },
     });
 
+    const token = await this.tokenService.getTokenById(tokenId);
+
     if (averagePriceResult && averagePriceResult._avg.price !== null) {
       const averagePrice = averagePriceResult._avg.price.toNumber();
 
@@ -105,13 +113,24 @@ export class TokenPriceProcessor extends WorkerHostProcessor {
         this.logger.log(
           `Token ${tokenId} has increased by more than 3% in the last 1 hour`,
         );
-        // Send an email notification
-        // await this.sendEmailNotification(price, averagePrice);
+
+        await this.sendEmailQueue.add(
+          'SendEmail',
+          {
+            to: HYPERHIRE_EMAIL,
+            subject: 'Token Alert',
+            content: `Token ${token.symbol} on chain ${token.chainId} has increased by more than 3% in the last 1 hour`,
+          },
+          {
+            jobId: `${HYPERHIRE_EMAIL}:${tokenId}:${dateToTimestamp(timestamp)}`,
+          },
+        );
       }
     }
   }
 
-  private async userAlert({ tokenId, price }: TokenAlertDto) {
+  private async userAlert({ tokenId, price, timestamp }: TokenAlertDto) {
+    const token = await this.tokenService.getTokenById(tokenId);
     const users = await this.db
       .selectFrom('alertSettings')
       .innerJoin('alerts', 'alertSettings.alertId', 'alerts.id')
@@ -121,7 +140,21 @@ export class TokenPriceProcessor extends WorkerHostProcessor {
       .execute();
 
     // Send email to users
-    console.log('User Alert', users);
+    const alerts = users.map((user) => ({
+      to: user.email,
+      subject: 'Token Alert',
+      content: `Token ${token.symbol} on chain ${token.chainId} has reached the threshold price of $${user.threshold}`,
+    }));
+
+    await this.sendEmailQueue.addBulk(
+      alerts.map((alert) => ({
+        name: 'SendEmail',
+        data: alert,
+        opts: {
+          jobId: `${alert.to}:${tokenId}:${dateToTimestamp(timestamp)}`,
+        },
+      })),
+    );
   }
 
   private async createAlertQueue({ tokenId, price, timestamp }: TokenAlertDto) {
